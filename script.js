@@ -191,7 +191,8 @@ function calculateSGPA() {
         const credits = parseFloat(course.credits);
         if (!isNaN(credits) && course.grade) {
             totalCredits += credits;
-            totalPoints += credits * gradePoints[course.grade];
+            const points = gradePoints[course.grade];
+            totalPoints += parseFloat((credits * points).toFixed(2)); // round per course
         }
     });
 
@@ -201,6 +202,7 @@ function calculateSGPA() {
         points: totalPoints
     };
 }
+
 
 // ===============================
 // CGPA Calculation
