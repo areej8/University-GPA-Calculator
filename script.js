@@ -79,7 +79,7 @@ function updateGradePoint(grade, value) {
     }
 }
 
-// Render courses table
+// Render courses table with mobile-friendly data labels
 function renderCourses() {
     const tbody = document.getElementById('coursesTableBody');
     tbody.innerHTML = '';
@@ -87,13 +87,13 @@ function renderCourses() {
     courses.forEach(course => {
         const row = document.createElement('tr');
         row.innerHTML = `
-            <td>
+            <td data-label="Course Name">
                 <input type="text" value="${escapeHtml(course.name)}" 
                        placeholder="e.g., Data Structures"
                        onchange="updateCourse(${course.id}, 'name', this.value)"
                        maxlength="100">
             </td>
-            <td>
+            <td data-label="Credits">
                 <input type="number" value="${course.credits}" 
                        placeholder="3"
                        min="0.5"
@@ -101,7 +101,7 @@ function renderCourses() {
                        step="0.5"
                        oninput="validateInput(this); updateCourse(${course.id}, 'credits', this.value)">
             </td>
-            <td>
+            <td data-label="Grade">
                 <select onchange="updateCourse(${course.id}, 'grade', this.value)">
                     <option value="">Select</option>
                     ${Object.keys(gradePoints).map(grade => 
@@ -109,7 +109,7 @@ function renderCourses() {
                     ).join('')}
                 </select>
             </td>
-            <td>
+            <td data-label="">
                 <button class="btn-delete" onclick="removeCourse(${course.id})" 
                         ${courses.length === 1 ? 'disabled' : ''}
                         aria-label="Remove course">
