@@ -32,40 +32,48 @@ function init() {
     renderGradeScale();
     renderCourses();
     calculateAll();
+    attachBlurValidation(); // Add this line
 
     // Attach CGPA input listeners safely
     const prevCreditsInput = document.getElementById('prevCredits');
     const prevCGPAInput = document.getElementById('prevCGPA');
 
     if (prevCreditsInput) {
-        prevCreditsInput.addEventListener('input', function () {
-            validateInput(this);
-            calculateAll();
-        });
+        prevCreditsInput.addEventListener('input', calculateAll);
     }
 
     if (prevCGPAInput) {
-        prevCGPAInput.addEventListener('input', function () {
-            validateInput(this);
-            calculateAll();
-        });
+        prevCGPAInput.addEventListener('input', calculateAll);
     }
 }
 
 // ===============================
-// Input validation
+// Input validation (on blur)
 // ===============================
 function validateInput(input) {
     const min = parseFloat(input.getAttribute('min')) || 0;
     const max = parseFloat(input.getAttribute('max')) || Infinity;
-    let value = parseFloat(input.value);
+    const value = parseFloat(input.value);
+    
+    if (isNaN(value) || input.value === '') {
+        return;
+    }
+    
+    if (value < min) {
+        input.value = min;
+    } else if (value > max) {
+        input.value = max;
+    }
+}
 
-    if (isNaN(value)) return;
-
-    if (value < min) value = min;
-    if (value > max) value = max;
-
-    input.value = value;
+// Add blur event listeners for better validation
+function attachBlurValidation() {
+    const inputs = document.querySelectorAll('input[type="number"]');
+    inputs.forEach(input => {
+        input.addEventListener('blur', function() {
+            validateInput(this);
+        });
+    });
 }
 
 // ===============================
@@ -83,9 +91,10 @@ function renderGradeScale() {
         gradeItem.innerHTML = `
             <div class="grade-badge">${grade}</div>
             <input type="number" step="0.1" min="0" max="4" value="${points}"
-                   oninput="validateInput(this); updateGradePoint('${grade}', this.value)">
+                   oninput="updateGradePoint('${grade}', this.value)">
         `;
         container.appendChild(gradeItem);
+        attachBlurValidation();
     });
 }
 
@@ -120,7 +129,7 @@ function renderCourses() {
             <td data-label="Credits">
                 <input type="number" value="${course.credits}"
                        min="0.5" max="20" step="0.5"
-                       oninput="validateInput(this); updateCourse(${course.id}, 'credits', this.value)">
+                       oninput="updateCourse(${course.id}, 'credits', this.value)">
             </td>
             <td data-label="Grade">
                 <select onchange="updateCourse(${course.id}, 'grade', this.value)">
@@ -139,6 +148,7 @@ function renderCourses() {
             </td>
         `;
         tbody.appendChild(row);
+        attachBlurValidation();
     });
 }
 
